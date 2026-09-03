@@ -1,0 +1,68 @@
+{
+  "ExtendedData": {
+    "inputs": [
+      "http://172.13.21.160:8013/RoleManagerService2FA/JaizRoleManagerService.svc?wsdl"
+    ],
+    "collectionTypes": [
+      "System.Array",
+      "System.Collections.Generic.Dictionary`2"
+    ],
+    "namespaceMappings": [
+      "*, JaizAuthService"
+    ],
+    "references": [
+      "Microsoft.Data.SqlClient, {Microsoft.Data.SqlClient, 2.1.7}",
+      "Microsoft.EntityFrameworkCore, {Microsoft.EntityFrameworkCore, 6.0.33}",
+      "Microsoft.EntityFrameworkCore.Abstractions, {Microsoft.EntityFrameworkCore.Abstractions, 6.0.33}",
+      "Microsoft.EntityFrameworkCore.Relational, {Microsoft.EntityFrameworkCore.Relational, 6.0.33}",
+      "Microsoft.EntityFrameworkCore.SqlServer, {Microsoft.EntityFrameworkCore.SqlServer, 6.0.33}",
+      "Microsoft.Extensions.Caching.Abstractions, {Microsoft.Extensions.Caching.Abstractions, 6.0.0}",
+      "Microsoft.Extensions.Caching.Memory, {Microsoft.Extensions.Caching.Memory, 6.0.1}",
+      "Microsoft.Extensions.Configuration.Abstractions, {Microsoft.Extensions.Configuration.Abstractions, 6.0.0}",
+      "Microsoft.Extensions.DependencyInjection, {Microsoft.Extensions.DependencyInjection, 6.0.1}",
+      "Microsoft.Extensions.DependencyInjection.Abstractions, {Microsoft.Extensions.DependencyInjection.Abstractions, 6.0.0}",
+      "Microsoft.Extensions.Logging, {Microsoft.Extensions.Logging, 6.0.0}",
+      "Microsoft.Extensions.Logging.Abstractions, {Microsoft.Extensions.Logging.Abstractions, 6.0.0}",
+      "Microsoft.Extensions.ObjectPool, {Microsoft.Extensions.ObjectPool, 6.0.16}",
+      "Microsoft.Extensions.Options, {Microsoft.Extensions.Options, 6.0.0}",
+      "Microsoft.Extensions.Primitives, {Microsoft.Extensions.Primitives, 6.0.0}",
+      "Microsoft.IdentityModel.JsonWebTokens, {Microsoft.IdentityModel.JsonWebTokens, 6.8.0}",
+      "Microsoft.IdentityModel.Logging, {Microsoft.IdentityModel.Logging, 6.8.0}",
+      "Microsoft.IdentityModel.Protocols, {Microsoft.IdentityModel.Protocols, 6.8.0}",
+      "Microsoft.IdentityModel.Protocols.OpenIdConnect, {Microsoft.IdentityModel.Protocols.OpenIdConnect, 6.8.0}",
+      "Microsoft.IdentityModel.Protocols.WsTrust, {Microsoft.IdentityModel.Protocols.WsTrust, 6.8.0}",
+      "Microsoft.IdentityModel.Tokens, {Microsoft.IdentityModel.Tokens, 6.8.0}",
+      "Microsoft.IdentityModel.Tokens.Saml, {Microsoft.IdentityModel.Tokens.Saml, 6.8.0}",
+      "Microsoft.IdentityModel.Xml, {Microsoft.IdentityModel.Xml, 6.8.0}",
+      "System.Collections.Immutable, {System.Collections.Immutable, 6.0.0}",
+      "System.Diagnostics.DiagnosticSource, {System.Diagnostics.DiagnosticSource, 6.0.1}",
+      "System.Formats.Asn1, {System.Formats.Asn1, 6.0.0}",
+      "System.IdentityModel.Tokens.Jwt, {System.IdentityModel.Tokens.Jwt, 6.8.0}",
+      "System.IO, {System.IO, 4.3.0}",
+      "System.Reflection.DispatchProxy, {System.Reflection.DispatchProxy, 4.7.1}",
+      "System.Runtime, {System.Runtime, 4.3.0}",
+      "System.Runtime.CompilerServices.Unsafe, {System.Runtime.CompilerServices.Unsafe, 6.0.0}",
+      "System.Security.AccessControl, {System.Security.AccessControl, 6.0.0}",
+      "System.Security.Cryptography.Cng, {System.Security.Cryptography.Cng, 4.5.0}",
+      "System.Security.Cryptography.Pkcs, {System.Security.Cryptography.Pkcs, 6.0.1}",
+      "System.Security.Cryptography.Xml, {System.Security.Cryptography.Xml, 6.0.1}",
+      "System.Security.Principal.Windows, {System.Security.Principal.Windows, 5.0.0}",
+      "System.ServiceModel.Duplex, {System.ServiceModel.Duplex, 6.0.0}",
+      "System.ServiceModel.Federation, {System.ServiceModel.Federation, 6.0.0}",
+      "System.ServiceModel.Http, {System.ServiceModel.Http, 6.0.0}",
+      "System.ServiceModel.NetFramingBase, {System.ServiceModel.NetFramingBase, 6.0.0}",
+      "System.ServiceModel.NetTcp, {System.ServiceModel.NetTcp, 6.0.0}",
+      "System.ServiceModel.Primitives, {System.ServiceModel.Primitives, 6.0.0}",
+      "System.ServiceModel.Security, {System.ServiceModel.Security, 6.0.0}",
+      "System.Text.Encoding, {System.Text.Encoding, 4.3.0}",
+      "System.Threading.Tasks, {System.Threading.Tasks, 4.3.0}",
+      "System.Xml.ReaderWriter, {System.Xml.ReaderWriter, 4.3.0}",
+      "System.Xml.XmlDocument, {System.Xml.XmlDocument, 4.3.0}",
+      "X.PagedList, {X.PagedList, 10.5.7}",
+      "X.PagedList.Mvc.Core, {X.PagedList.Mvc.Core, 10.5.7}"
+    ],
+    "sync": true,
+    "targetFramework": "net6.0",
+    "typeReuseMode": "All"
+  }
+}

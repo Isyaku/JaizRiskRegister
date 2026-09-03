@@ -1,0 +1,106 @@
+﻿@{
+    ViewData["Title"] = "Pull for Edit";
+}
+
+<!-- Start content -->
+<div class="content">
+    <div class="">
+        <div class="page-header-title">
+            <h4 id="pg_header" class="page-title">@ViewBag.Title</h4>
+        </div>
+    </div>
+    <div class="page-content-wrapper" style="margin-top: -64px;">
+        <div class="panel panel-primary">
+            <div id="selectDept" class="panel-body">
+                <div class="text-center">
+                    <h4>Select Department</h4>
+                    <div class="form-group" style="width: 50%; margin: 0 auto;">
+                        @Html.DropDownList("id", (SelectList)ViewBag.DepartmentList, "Departments", new { @class = "form-control", id = "departmentDropdown" })
+                    </div>
+                </div>
+            </div>
+            <div class="text-center">
+                <p class="text-danger">@ViewBag.ErrMessage</p>
+            </div>
+            
+            <div class="panel-body">
+                <div id="headInfoSection" style="display:none; margin-top: 20px;">
+                    <div class="form-group text-center">
+                        <label>Current Head:</label>
+                        <p id="currentHead" class="form-control-static"></p>
+                    </div>
+
+                    <div class="form-group text-center">
+                        <label for="newHead">Enter New Head:</label>
+                        <input type="text" id="newHead" class="form-control" placeholder="Enter new head name" style="width: 50%; margin: 0 auto;" />
+                    </div>
+
+                    <div class="text-center">
+                        <button id="updateHeadBtn" class="btn btn-success">Update Head</button>
+                    </div>
+
+                    <div class="text-center" style="margin-top: 10px;">
+                        <p id="statusMessage" class="text-info"></p>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+       
+    </div>
+
+</div>
+
+@section Scripts {
+    @* <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> *@
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+            integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <script type="text/javascript">
+
+               $(document).ready(function () {
+            $('#departmentDropdown').on('change', function () {
+                var deptId = $(this).val();
+
+                if (deptId) {
+                    $.get('/SubmissionSchedule/GetDepartmentHead', { id: deptId }, function (data) {
+                        if (data.success) {
+                            $('#currentHead').text(data.head);
+                            $('#headInfoSection').show();
+                            $('#statusMessage').text('');
+                        } else {
+                            $('#headInfoSection').hide();
+                            alert(data.message);
+                        }
+                    });
+                } else {
+                    $('#headInfoSection').hide();
+                }
+            });
+
+            $('#updateHeadBtn').on('click', function () {
+                var deptId = $('#departmentDropdown').val();
+                var newHead = $('#newHead').val();
+
+                if (!newHead) {
+                    alert('Please enter a new head name.');
+                    return;
+                }
+
+                $.post('/SubmissionSchedule/UpdateDepartmentHead', { id: deptId, newHead: newHead }, function (data) {
+                    if (data.success) {
+                        $('#statusMessage').text(data.message);
+                        $('#currentHead').text(newHead);
+                        $('#newHead').val('');
+                    } else {
+                        $('#statusMessage').text(data.message).addClass('text-danger');
+                    }
+                });
+            });
+        });
+
+    </script>
+}
+

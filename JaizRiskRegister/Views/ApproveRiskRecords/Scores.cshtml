@@ -1,0 +1,141 @@
+﻿@{
+    ViewData["Title"] = "Edit Approval";
+}
+
+<!-- Start content -->
+<div class="content">
+    <div class="">
+        <div class="page-header-title">
+            <h4 id="pg_header" class="page-title">@ViewBag.Title</h4>
+        </div>
+    </div>
+    <div class="page-content-wrapper" style="margin-top: -64px;">
+        <div class="panel panel-primary">
+            <div class="text-center">
+                <p class="text-danger">@ViewBag.ErrMessage</p>
+            </div>
+
+            <div class="panel-body">
+                <div style="overflow-x: auto;" id="riskTableContainer">
+                    <table class="table table-striped" id="riskTable" style="display: none;">
+                        <thead>
+                            <tr>
+                                <th style="display: none;">SubmissionID</th>
+                                <th style="display: none;">Risk ID</th>
+                                <th style="display: none;">Department ID</th>
+                                <th style="display: none;">Submission Type</th>
+                                <th>Type of Risk</th>
+                                <th>Risk Area</th>
+                                <th>Risk Description</th>
+                                <th>Business Unit Impacted</th>
+                                <th>Impact (1-5)</th>
+                                <th>Likelihood (1-5)</th>
+                                <th>Inherent Risk Level (Impact x Likelihood)</th>
+                                <th>Key Controls Assessed by Management (Preliminary Assessment)</th>
+                                <th>Control Score (1-5)</th>
+                                <th>Status</th>
+                                <th>Action Plan</th>
+                                <th>Assigned To</th>
+                                <th>Residual Score</th>
+                                <th>Risk Level</th>
+                                <th style="display: none;">Modified</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Risk rows will be dynamically added here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center" id="submitBtn" style="margin-top: 20px; display: none;">
+            <button id="ApproveRiskChanges" class="btn btn-primary">Approve</button>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    @* <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> *@
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+            integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+            crossorigin="anonymous"></script>
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            var riskDepartmentId = '@(Context.Session.GetInt32("RiskDepartmentId") ?? 0)';
+            var submissionId = '@(Context.Session.GetInt32("SubmissionId") ?? 0)';
+            var riskSubmissionType = '@(Context.Session.GetString("RiskSubmissionType"))';
+
+            $('#ApproveRiskChanges').click(function () {
+                $.ajax({
+                    url: '/ApproveRiskRecords/ApproveScores',
+                    type: 'GET',
+                    data: {
+                        department_ID: riskDepartmentId,
+                        submission_ID: submissionId,
+                        submission_Type: riskSubmissionType
+                    },
+                    success: function () {
+                        alert('Risk approved successfully!');
+                    },
+                    error: function (xhr) {
+                        if (xhr.responseText.includes("Cannot approve")) {
+                            alert("The same user cannot edit and also approve.");
+                        } else{
+                            alert('An error occurred, unable to approve.');
+                        }
+                    }
+
+                });
+
+            });
+
+                $.ajax({
+                    url: '/ApproveRiskRecords/GetScoresForApproval',
+                    type: 'GET',
+                    data: { riskDepartmentId: riskDepartmentId, submissionId: submissionId, riskSubmissionType: riskSubmissionType },
+                    success: function (response) {
+                        if (response.success) {
+                            var tableBody = $("#riskTable tbody");
+                            response.data.forEach(function (risk) {
+                            var row_BgColor = risk.modified == '1' ? "background: slateblue; color: white;" : '';
+                            tableBody.append(`
+                            <tr style="${row_BgColor}">
+                            <td style="display: none;" class="submissionId">${risk.submission_ID}</td>
+                            <td style="display: none;" class="riskID">${risk.risk_ID}</td>
+                            <td style="display: none;" class="departmentId">${risk.department_ID}</td>
+                            <td style="display: none;" class="submissionType">${risk.submission_Type}</td>
+                            <td class="riskType">${risk.type_of_Risk}</td>
+                            <td class="riskArea">${risk.risk_Area}</td>
+                            <td class="riskDescription">${risk.risk_Description}</td>
+                            <td class="businessUnitImpacted">${risk.business_Unit_Impacted}</td>
+                            <td class="">${risk.impact}</td>
+                            <td class="">${risk.likelihood}</td>
+                            <td class="">${risk.inherent_level}</td>
+                            <td class="managementKeyControls">${risk.management_Controls}</td>
+                            <td class="managementKeyControls">${risk.control_Score}</td>
+                            <td class="managementKeyControls">${risk.status}</td>
+                            <td class="actionPlan">${risk.action_Plan}</td>
+                            <td class="assignedTo">${risk.assigned_To}</td>
+                            <td class="assignedTo">${risk.residual_Score}</td>
+                            <td class="assignedTo">${risk.risk_Level}</td>
+                            <td style="display: none;" class="">${risk.modified}</td>
+                            </tr>`);
+                        });
+                        $("#riskTable").show();
+                        $("#submitBtn").show();
+                    } else {
+                        alert(response.message);
+                    }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("AJAX error:", error);
+                    }
+
+                });
+        });
+
+    </script>
+}

@@ -1,0 +1,134 @@
+﻿@{
+    ViewData["Title"] = "Edit Approval";
+}
+
+<!-- Start content -->
+<div class="content">
+    <div class="">
+        <div class="page-header-title">
+            <h4 id="pg_header" class="page-title">@ViewBag.Title</h4>
+        </div>
+    </div>
+    <div class="page-content-wrapper" style="margin-top: -64px;">
+        <div class="panel-body">
+        </div>
+
+        <div class="panel-body">
+            <div style="overflow-x: auto;" id="riskTableListContainer">
+                <table class="table table-bordered" id="riskTableList">
+                    <thead>
+                        <tr>
+                            <th style="display: none;">Department ID</th>
+                            <th>Risk ID</th>
+                            <th>Type of Risk</th>
+                            <th>Risk Area</th>
+                            <th>Risk Description</th>
+                            <th>Business Unit Impacted</th>
+                            <th>Key Controls Assessed by Management (Preliminary Assessment)</th>
+                            <th>Action Plan</th>
+                            <th>Assigned To</th>
+                            <th style="display: none;">Modified</th>
+                            <th style="display: none;">IsApproved</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+
+        <div class="text-center" id="approveBtn" style="margin-top: 20px;">
+            <button id="approveRiskChanges" class="btn btn-primary">Approve Changes</button>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    @* <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> *@
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+            integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+            crossorigin="anonymous"></script>
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            var departmentId = '@(Context.Session.GetInt32("DepartmentID") ?? 0)';
+
+            if (departmentId == 0) {
+                console.warn("Department ID is missing or invalid.");
+                return; // Stop execution if departmentId is not set
+            }
+
+            $.ajax({
+                url: '/ApproveRiskRecords/GetRecordsForApproval',
+                type: 'GET',
+                data: { dept: departmentId },
+                success: function (response) {
+                    if (response.success) {
+                        var tableBody = $("#riskTableList tbody");
+                        response.data.forEach(function (risk) {
+                            var row_BgColor = risk.modified == '1' ? "background: slateblue; color: white;" : '';
+
+                            tableBody.append(`
+                            <tr style="${row_BgColor}">
+                            <td class="departmentId" style="display: none;">${risk.department_ID}</td>
+                            <td class="riskID">${risk.risk_ID}</td>
+                            <td class="riskType">${risk.type_of_Risk}</td>
+                            <td class="riskArea">${risk.risk_Area}</td>
+                            <td class="riskDescription">${risk.risk_Description}</td>
+                            <td class="businessUnitImpacted">${risk.business_Unit_Impacted}</td>
+                            <td class="managementKeyControls">${risk.management_Controls}</td>
+                            <td class="actionPlan">${risk.action_Plan}</td>
+                            <td class="assignedTo">${risk.assigned_To}</td>
+                            <td style="display: none;">${risk.modified}</td>
+                            <td style="display: none;">${risk.isApproved}</td>
+                            </tr>
+                            `);
+                        });
+
+                        $("#riskTableList").show();
+                    } else {
+                        alert(response.message);
+                    }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("AJAX error:", error);
+                        }
+
+                    });
+
+            $('#approveRiskChanges').click(function () {
+                var updatedRisks = [];
+
+                $('#riskTableList tbody tr').each(function () {
+                    var row = $(this);
+                    updatedRisks.push({
+                        Department_ID: row.find('.departmentId').text().trim(),
+                        Risk_ID: row.find('.riskID').text().trim(),                        
+                    });
+                });
+
+                $.ajax({
+                    url: '/ApproveRiskRecords/ApproveReords',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(updatedRisks),
+                    success: function () {
+                        alert('Approved successfully!');
+                    },
+                    error: function (xhr) {
+                        if (xhr.responseText.includes("Cannot approve")) {
+                            alert("The same user cannot edit and also approve.");
+                        } else{
+                            alert('An error occurred, unable to approve.');
+                        }                                              
+                    }
+                });
+            });
+
+        });
+    </script>
+}
+

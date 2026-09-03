@@ -1,0 +1,111 @@
+﻿@model RR_Schedule
+@{
+    ViewData["Title"] = "Create Submission Schedule";
+}
+<!-- Start content -->
+<div class="content">
+    <div class="">
+        <div class="page-header-title">
+            <h4 id="pg_header" class="page-title">@ViewBag.Title</h4>
+        </div>
+    </div>
+
+    <div class="page-content-wrapper" style="margin-top: -64px;">
+        <div class="panel panel-primary">
+            <div class="panel-body d-flex align-content-center text-center">
+                <div class="container" >
+                    <form asp-action="Create" method="post">
+                        <!-- Validation Summary -->
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                        <div class="form-group">
+                            <label asp-for="Submission_Type">Submission Type</label>
+                            <select asp-for="Submission_Type" class="form-control" id="submissionType" onchange="togglePeriodOptions()" style="width: 45%; margin-left:28%">
+                                <option value="">Select Type</option>
+                                <option value="Monthly">Monthly</option>
+                                <option value="Quarterly">Quarterly</option>
+                            </select>
+                            <span asp-validation-for="Submission_Type" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group" id="monthContainer" style="display: none;">
+                            <label asp-for="Submission_Month">Month</label>
+                            <select asp-for="Submission_Month" class="form-control" style="width: 45%; margin-left:28%">
+                                <option value="">Select Month</option>
+                                <option value="1">January</option>
+                                <option value="2">February</option>
+                                <option value="3">March</option>
+                                <option value="4">April</option>
+                                <option value="5">May</option>
+                                <option value="6">June</option>
+                                <option value="7">July</option>
+                                <option value="8">August</option>
+                                <option value="9">September</option>
+                                <option value="10">October</option>
+                                <option value="11">November</option>
+                                <option value="12">December</option>
+                            </select>
+                            <span asp-validation-for="Submission_Month" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group" id="quarterContainer" style="display: none;">
+                            <label asp-for="Submission_Quarter">Quarter</label>
+                            <select asp-for="Submission_Quarter" class="form-control" style="width: 45%; margin-left:28%">
+                                <option value="">Select Quarter</option>
+                                <option value="1">1st Quarter</option>
+                                <option value="2">2nd Quarter</option>
+                                <option value="3">3rd Quarter</option>
+                                <option value="4">4th Quarter</option>
+                            </select>
+                            <span asp-validation-for="Submission_Quarter" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Submission_Year">Year</label>
+                            <select asp-for="Submission_Year" class="form-control" style="width: 45%; margin-left:28%">
+                                <option value="">Select Year</option>
+                                <option value="2023">2023</option>
+                                <option value="2024">2024</option>
+                                <option value="2025">2025</option>
+                                <option value="2026">2026</option>
+                                <option value="2027">2027</option>
+                                <option value="2028">2028</option>
+                                <option value="2029">2029</option>
+                                <option value="2030">2030</option>
+                            </select>
+                            <span asp-validation-for="Submission_Year" class="text-danger"></span>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>
+                    <div id="messageDiv" class="text-center">
+                        <p class="text-danger">@ViewBag.ErrMessage</p>
+                        <p class="text-success">@ViewBag.SuccessMessage</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function togglePeriodOptions() {
+        const submissionType = document.getElementById('submissionType').value;
+        const monthContainer = document.getElementById('monthContainer');
+        const quarterContainer = document.getElementById('quarterContainer');
+
+        if (submissionType === 'Monthly') {
+            monthContainer.style.display = 'block';
+            quarterContainer.style.display = 'none';
+        } else if (submissionType === 'Quarterly') {
+            monthContainer.style.display = 'none';
+            quarterContainer.style.display = 'block';
+        } else {
+            monthContainer.style.display = 'none';
+            quarterContainer.style.display = 'none';
+        }
+    }
+
+    // Initialize the view
+    togglePeriodOptions();
+</script>

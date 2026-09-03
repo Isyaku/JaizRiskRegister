@@ -1,0 +1,470 @@
+﻿@{
+    ViewData["Title"] = "Pull for Edit";
+}
+
+<!-- Start content -->
+<div class="content">
+    <div class="">
+        <div class="page-header-title">
+            <h4 id="pg_header" class="page-title">@ViewBag.Title</h4>
+        </div>
+    </div>
+    <div class="page-content-wrapper" style="margin-top: -64px;">
+        <div class="panel panel-primary">
+            <div id="selectDept" class="panel-body">
+                <div class="text-center">
+                    <h4>Select Department</h4>
+                    <div class="form-group" style="width: 50%; margin: 0 auto;">
+                        @Html.DropDownList("id", (SelectList)ViewBag.DepartmentList, "Departments", new { @class = "form-control", id = "departmentDropdown" })
+                    </div>
+                </div>
+            </div>
+            <div class="text-center">
+                <p class="text-danger">@ViewBag.ErrMessage</p>
+            </div>
+
+            <div id="selectSubType" class="panel-body">
+                <div class="text-center">
+                    <h6>Submission Type</h6>
+                    <div style="width: 30%; margin: 0 auto;" class="form-group">
+                        <select class="form-control" id="submissionTypeDropdown">
+                            <option value="">Select Type</option>
+                            <option value="monthly">Monthly</option>
+                            <option value="quarterly">Quarterly</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div id="selectTypeAndYear" class="panel-body">
+                <div class="row">
+                    <div class="col-md-8 col-md-offset-2">
+                        <div class="row">
+                            <!-- Month dropdown -->
+                            <div class="col-md-6 text-center" id="monthContainer" style="display: none">
+                                <h6>Month</h6>
+                                <div style="width: 40%; margin: 0 auto;" class="form-group">
+                                    <select class="form-control" id="submissionMonthDropdown">
+                                        <option value="">Select Month</option>
+                                        <option value="1">January</option>
+                                        <option value="2">February</option>
+                                        <option value="3">March</option>
+                                        <option value="4">April</option>
+                                        <option value="5">May</option>
+                                        <option value="6">June</option>
+                                        <option value="7">July</option>
+                                        <option value="8">August</option>
+                                        <option value="9">September</option>
+                                        <option value="10">October</option>
+                                        <option value="11">November</option>
+                                        <option value="12">December</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Quarter dropdown -->
+                            <div class="col-md-6 text-center" id="quarterContainer" style="display: none;">
+                                <h6>Quarter</h6>
+                                <div style="width: 40%; margin: 0 auto;" class="form-group">
+                                    <select class="form-control" id="submissionQuarterDropdown">
+                                        <option value="">Select Quarter</option>
+                                        <option value="1">1st Quarter</option>
+                                        <option value="2">2nd Quarter</option>
+                                        <option value="3">3rd Quarter</option>
+                                        <option value="4">4th Quarter</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Year dropdown -->
+                            <div class="col-md-6 text-center" id="yearContainer" style="display: none">
+                                <h6>Year</h6>
+                                <div style="width: 40%; margin: 0 auto;" class="form-group">
+                                    <select class="form-control" id="submissionYearDropdown">
+                                        <option value="">Select Year</option>
+                                        <option value="2023">2023</option>
+                                        <option value="2024">2024</option>
+                                        <option value="2025">2025</option>
+                                        <option value="2026">2026</option>
+                                        <option value="2027">2027</option>
+                                        <option value="2028">2028</option>
+                                        <option value="2029">2029</option>
+                                        <option value="2030">2030</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center" id="pullBtn" style="margin-top: 20px;">
+                <button id="pullSubmissionBtn" class="btn btn-primary">Pull Submission</button>
+            </div>
+
+            <div class="panel-body">
+                <div style="overflow-x: auto;" id="riskTableContainer">
+                    <table class="table table-striped" id="riskTable" style="display: none;">
+                        <thead>
+                            <tr>
+                                <th style="display: none;">SubmissionID</th>
+                                <th style="display: none;">Risk ID</th>
+                                <th style="display: none;">Department ID</th>
+                                <th style="display: none;">Submission Type</th>
+                                <th>Type of Risk</th>
+                                <th>Risk Area</th>
+                                <th>Risk Description</th>
+                                <th>Business Unit Impacted</th>
+                                <th>Impact (1-5)</th>
+                                <th>Likelihood (1-5)</th>
+                                <th>Inherent Risk Level (Impact x Likelihood)</th>
+                                <th>Key Controls Assessed by Management (Preliminary Assessment)</th>
+                                <th>Control Score (1-5)</th>
+                                <th>Status</th>                                
+                                <th>Action Plan</th>
+                                <th>Assigned To</th>
+                                <th>Residual Score</th>
+                                <th>Risk Level</th>
+                                <th style="display: none;">Modified</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Risk rows will be dynamically added here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center" id="submitBtn" style="margin-top: 20px; display: none;">
+            <button id="submitRiskChanges" class="btn btn-primary">Save Changes</button>
+            <button id="downloadExcelBtn" class="btn btn-success">Download to Excel</button>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    @* <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> *@
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+            integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            $('#submissionTypeDropdown').change(function () {
+                var submissionType = $(this).val();
+
+                if (submissionType === 'monthly') {
+
+                    $('#monthContainer').show();
+                    $('#yearContainer').show();
+                    $('#quarterContainer').hide();
+                }                
+                else if (submissionType === 'quarterly') {
+                    
+                    $('#quarterContainer').show();
+                    $('#yearContainer').show();
+                    $('#monthContainer').hide();
+                }                
+                else {
+                    $('#monthContainer').hide();
+                    $('#yearContainer').hide();
+                    $('#quarterContainer').hide();
+                }
+            });
+
+            // Initially hide both month and quarter dropdowns (optional, based on initial state)
+            $('#monthContainer').hide();
+            $('#yearContainer').hide();
+            $('#quarterContainer').hide();
+
+            $('#pullSubmissionBtn').click(function () {
+
+                var departmentId = $('#departmentDropdown').val();
+                var submissionMonth = $('#submissionMonthDropdown').val();
+                var submissionQuarter = $('#submissionQuarterDropdown').val();
+                var submissionYear = $('#submissionYearDropdown').val();
+                var submissionType = $('#submissionTypeDropdown').val();
+
+                // Check if any of the dropdowns are not selected (empty value)
+                let errorMessages = [];
+
+                if (!departmentId) {
+                    errorMessages.push('Department');
+                }
+
+                if (!submissionYear) {
+                    errorMessages.push('Submission Year');
+                }
+
+                if (!submissionMonth && !submissionQuarter) {
+                    errorMessages.push('Submission Month or Quarter');
+                }
+
+                if (errorMessages.length > 0) {
+                    alert('Please select the following required fields: ' + errorMessages.join(', ') + '.');
+                    return;
+                }
+
+                $.ajax({
+                    url: '/PullForEdit/DepartmentalRisk',
+                    type: 'GET',
+                    data: { departmentId: departmentId, submissionMonth: submissionMonth, submissionQuarter: submissionQuarter, submissionYear: submissionYear, submissionType: submissionType },
+                    success: function (risks) {
+                        var riskTableBody = '';
+
+                        if (Array.isArray(risks) && risks.length > 0) {
+                            $.each(risks, function (index, risk) {
+                                riskTableBody += '<tr>';
+                                riskTableBody += '<td class="submissionId" style="display: none;">' + risk.submission_ID + '</td>';
+                                riskTableBody += '<td class="riskId" style="display: none;">' + risk.risk_ID + '</td>';
+                                riskTableBody += '<td class="departmentId" style="display: none;">' + risk.department_ID + '</td>';
+                                riskTableBody += '<td class="submissionType" style="display: none;">' + risk.submission_Type + '</td>';
+
+                                riskTableBody += '<td>' + risk.type_of_Risk + '</td>';
+                                riskTableBody += '<td>' + risk.risk_Area + '</td>';
+                                riskTableBody += '<td>' + risk.risk_Description + '</td>';
+                                riskTableBody += '<td>' + risk.business_Unit_Impacted + '</td>';
+
+                                riskTableBody += '<td>';
+                                riskTableBody += '<select class="form-control impactDropdown">';
+                                for (var i = 0; i <= 5; i++) {
+                                    var selected = (risk.impact == i) ? 'selected="selected"' : '';
+                                    riskTableBody += '<option value="' + i + '" ' + selected + '>' + i + '</option>';
+                                }
+                                riskTableBody += '</select>';
+                                riskTableBody += '</td>';
+
+                                riskTableBody += '<td>';
+                                riskTableBody += '<select class="form-control likelihoodDropdown">';
+                                for (var i = 0; i <= 5; i++) {
+                                    var selected = (risk.likelihood == i) ? 'selected="selected"' : '';
+                                    riskTableBody += '<option value="' + i + '" ' + selected + '>' + i + '</option>';
+                                }
+                                riskTableBody += '</select>';
+                                riskTableBody += '</td>';
+
+                                var impact = risk.Impact || 0;
+                                var likelihood = risk.Likelihood || 0;
+                                var inherentLevel = (impact * likelihood) || risk.inherent_level;
+                                riskTableBody += '<td class="inherentLevel">' + inherentLevel + '</td>';
+
+                                riskTableBody += '<td>' + risk.management_Controls + '</td>';
+
+                                // Drop-down for Control Score
+                                riskTableBody += '<td>';
+                                riskTableBody += '<select class="form-control controlScoreDropdown">';
+                                for (var i = 0; i <= 5; i++) {
+                                    var selected = (risk.control_Score == i) ? 'selected="selected"' : '';
+                                    riskTableBody += '<option value="' + i + '" ' + selected + '>' + i + '</option>';
+                                }
+                                riskTableBody += '</select>';
+                                riskTableBody += '</td>';
+
+                                // Drop-down for Status
+                                riskTableBody += '<td>';
+                                riskTableBody += '<select class="form-control statusDropdown" style="width:94px;">';
+                                var statusOptions = ['Open', 'Closed'];
+                                for (var i = 0; i < statusOptions.length; i++) {
+                                    var selected = (risk.status.trim() === statusOptions[i]) ? 'selected="selected"' : '';
+                                    riskTableBody += '<option value="' + statusOptions[i] + '" ' + selected + '>' + statusOptions[i] + '</option>';
+                                }
+                                riskTableBody += '</select>';
+                                riskTableBody += '</td>';
+
+
+                                riskTableBody += '<td>' + risk.action_Plan + '</td>';
+                                riskTableBody += '<td>' + risk.assigned_To + '</td>';
+
+
+                                riskTableBody += '<td class="residualScore">' + risk.residual_Score + '</td>';
+                                // riskTableBody += '<td>';
+                                // riskTableBody += '<select class="form-control residualScoreDropdown">';
+                                // for (var i = 0; i <= 5; i++) {
+                                //     var selected = (risk.residual_Score == i) ? 'selected="selected"' : '';
+                                //     riskTableBody += '<option value="' + i + '" ' + selected + '>' + i + '</option>';
+                                // }
+                                // riskTableBody += '</select>';
+                                // riskTableBody += '</td>';
+
+                                // var riskLevel = inherentLevel <= 5 ? "LOW" : (inherentLevel <= 12 ? "MEDIUM" : "HIGH");
+                                var riskLevel = inherentLevel > 20 ? "CRITICAL" : (inherentLevel > 12 ? "HIGH" : (inherentLevel > 5 ? "MEDIUM" : "LOW"));
+                                var riskLevelBgColor = inherentLevel <= 5 ? "background-color:green;" : (inherentLevel <= 12 ? "background-color:orange;" : "background-color:red;");
+
+                                riskTableBody += '<td class="riskLevel" style="' + riskLevelBgColor + ' color:white;">' + riskLevel + '</td>';
+
+                                //var riskLevel = inherentLevel <= 3 ? "LOW" : "HIGH";
+                                //var riskLevelBgColor = inherentLevel <= 3 ? "background-color:green;" : "background-color:red;";
+                                //riskTableBody += '<td class="riskLevel" style="' + riskLevelBgColor + ' color:white;">' + riskLevel + '</td>';
+                                riskTableBody += '<td class="modified" style="display: none;">' + risk.modified + '</td>';
+                            });
+
+                            $('#riskTable').show();
+                            $('#riskTableContainer').show();
+                            $('#submitBtn').show();
+                            $('#selectDept').hide();
+                            $('#selectSubType').hide();
+                            $('#selectTypeAndYear').hide();
+                            $('#pullSubmissionBtn').hide();
+                        } else {
+                            riskTableBody = '<tr><td class="text-danger" colspan="12">No record found for this department.</td></tr>';
+                            $('#riskTable').show();
+                            $('#riskTableContainer').show();
+                            $('#submitBtn').show();
+                            $('#selectDept').hide();
+                            $('#selectSubType').hide();
+                            $('#selectTypeAndYear').hide();
+                            $('#pullSubmissionBtn').hide();
+                        }
+
+                        $('#riskTable tbody').html(riskTableBody);
+
+                        // Attach event listener to update Inherent Level when Impact or Likelihood is changed
+                        $('.impactDropdown, .likelihoodDropdown, .controlScoreDropdown, .statusDropdown').change(function () {
+                           
+                            var row = $(this).closest('tr');
+
+                            var impact = parseInt(row.find('.impactDropdown').val());
+                            var likelihood = parseInt(row.find('.likelihoodDropdown').val());
+                            var controlScore = parseInt(row.find('.controlScoreDropdown').val());
+
+                            var inherentLevel = impact * likelihood;
+                            var residualScore = 5 - controlScore;
+
+                            row.find('.inherentLevel').text(inherentLevel);
+                            row.find('.residualScore').text(residualScore);
+
+                            // var riskLevel = inherentLevel <= 5 ? "LOW" : (inherentLevel <= 12 ? "MEDIUM" : "HIGH");
+                            var riskLevel = inherentLevel > 20 ? "CRITICAL" : (inherentLevel > 12 ? "HIGH": (inherentLevel > 5 ? "MEDIUM" : "LOW"));
+                            var riskLevelBgColor = inherentLevel <= 5 ? "green" : (inherentLevel <= 12 ? "orange" : "red");
+
+                            row.find('.riskLevel').text(riskLevel).css({
+                                "background-color": riskLevelBgColor,
+                                "color": "white"
+                            });
+
+                            row.find('.modified').text("1");
+
+                            //var riskLevel = inherentLevel <= 3 ? "LOW" : "HIGH";
+                            //var riskLevelBgColor = inherentLevel <= 3 ? "green" : "red";
+
+                            //row.find('.riskLevel').text(riskLevel).css({
+                            //    "background-color": riskLevelBgColor,
+                            //    "color": "white"
+                            //});
+                        });
+                    },
+                    error: function () {
+                        $('#riskTable tbody').html('<tr><td class="text-danger" colspan="12">Error occurred while fetching risks.</td></tr>');
+                        $('#riskTable').show();
+                        $('#riskTableContainer').show();
+                        $('#submitBtn').show();
+                        $('#selectDept').hide();
+                        $('#selectSubType').hide();
+                        $('#selectTypeAndYear').hide();
+                        $('#pullSubmissionBtn').hide();
+                    }
+                });                
+                
+            });
+            
+            $('#downloadExcelBtn').click(function () {
+                // Get the table element and clone it to avoid modifying the original table
+                var table = document.getElementById("riskTable").cloneNode(true);
+
+                var rows = table.getElementsByTagName("tr");
+                
+                // Define indices of the columns to be removed and the dropdown columns
+                var columnsToRemove = [0, 2, 3];
+                var dropdownColumns = {8: "impactDropdown", 9: "likelihoodDropdown", 11: "controlScoreDropdown", 12: "statusDropdown"};
+
+                // Loop through each row to remove columns and replace dropdowns with selected values
+                for (var i = 0; i < rows.length; i++) {
+                    var cells = rows[i].getElementsByTagName("td");
+                    var headerCells = rows[i].getElementsByTagName("th");
+
+                    // Replace dropdown cells with their selected values
+                    for (var colIndex in dropdownColumns) {
+                        var cell = cells[colIndex];
+                        if (cell && cell.querySelector("select")) {
+                            cell.textContent = cell.querySelector("select").value;
+                        }
+                    }
+
+                    // Remove specified columns from last to first to avoid index shifting
+                    columnsToRemove.slice().reverse().forEach(function (index) {
+                        if (cells.length > 0) {
+                            cells[index].remove();
+                        }
+                        if (headerCells.length > 0) {
+                            headerCells[index].remove();
+                        }
+                    });
+                }
+                
+                var workbook = XLSX.utils.book_new();
+                var worksheet = XLSX.utils.table_to_sheet(table, { raw: true });
+                
+                XLSX.utils.book_append_sheet(workbook, worksheet, "Risk Data");
+                XLSX.writeFile(workbook, "RiskData.xlsx");
+            });
+
+            $('#submitRiskChanges').click(function () {
+                var updatedRisks = [];
+
+                $('#riskTable tbody tr').each(function () {
+                    var submissionId = $(this).find('.submissionId').text().trim();
+                    var riskId = $(this).find('.riskId').text().trim();
+                    var riskDepartmentId = $(this).find('.departmentId').text().trim();
+                    var riskSubmissionType = $(this).find('.submissionType').text().trim();
+                    var impact = $(this).find('.impactDropdown').val().trim();
+                    var likelihood = $(this).find('.likelihoodDropdown').val().trim();
+                    var inherentLevel = $(this).find('.inherentLevel').text().trim();
+                    var status = $(this).find('.statusDropdown').val().trim();
+                    var controlScore = $(this).find('.controlScoreDropdown').val().trim();
+                    var residualScore = $(this).find('.residualScore').text().trim();
+                    var riskLevel = $(this).find('.riskLevel').text().trim();
+                    var modified = $(this).find('.modified').text().trim();
+                    
+                    updatedRisks.push({
+                        Submission_ID: submissionId,
+                        Risk_ID: riskId,
+                        Department_ID: riskDepartmentId,
+                        Submission_Type: riskSubmissionType,
+                        Impact: impact,
+                        Likelihood: likelihood,
+                        Inherent_level: inherentLevel,
+                        Status: status,
+                        Control_Score: controlScore,
+                        Residual_Score: residualScore,
+                        Risk_Level: riskLevel,
+                        Modified: modified
+                    });
+                });
+
+                // Send updated data to the server using AJAX
+                   $.ajax({
+                        url: '/PullForEdit/UpdateRisk',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify(updatedRisks),
+                        success: function (response) {
+                            alert('Risk updates saved successfully!');
+                        },
+                        error: function () {
+                            alert('An error occurred while saving changes.');
+                        }
+                    });
+            });
+
+
+            
+
+        });
+    </script>
+}
+

@@ -1,0 +1,139 @@
+﻿@{
+    ViewData["Title"] = "Change Approver";
+}
+
+<!-- Start content -->
+<div class="content">
+    <div class="">
+        <div class="page-header-title">
+            <h4 id="pg_header" class="page-title">@ViewBag.Title</h4>
+        </div>
+    </div>
+    <div class="page-content-wrapper" style="margin-top: -64px;">
+        <div class="panel panel-primary">
+
+            <div class="text-center panel-body">
+                <button id="riskScoreBtn" class="btn btn-primary">Risk Score Approval</button>
+                <button id="riskRecordBtn" class="btn btn-primary">Risk Record Approval</button>
+            </div>
+        </div>
+
+        <div class="panel-body">
+            <table class="table table-bordered" id="scoreTable" style="display: none;">
+                <thead>
+                    <tr>
+                        <th>S/N</th>
+                        <th style="display:none;">DEPARTMENT_ID</th>
+                        <th>DEPARTMENT</th>
+                        <th style="display:none;">SUBMISSION_ID</th>
+                        <th>SUBMISSION_YEAR</th>
+                        <th>SUBMISSION_TYPE</th>
+                        <th>ACTION</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Risk rows will be dynamically added here -->
+                </tbody>
+            </table>
+
+        </div>
+
+        <div class="panel-body">
+            <table class="table table-bordered" id="riskTable" style="display: none;">
+                <thead>
+                    <tr>
+                        <th>S/N</th>
+                        <th>DEPARTMENT</th>
+                        <th>ACTION</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Risk rows will be dynamically added here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    @* <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> *@
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+            integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+            crossorigin="anonymous"></script>
+    <script>
+        $(document).ready(function () {
+            $('#riskScoreBtn').on("click", function () {
+                $.ajax({
+                    url: '/ApproveRiskRecords/ScoresApproval',
+                    type: 'GET',
+                    success: function (risks) {
+                        var scoreTableBody = '';
+
+                        // Always show the score table and hide the risk table
+                        $('#scoreTable').show();
+                        $('#riskTable').hide();
+                        $('#riskTableContainer').hide();
+
+                        if (Array.isArray(risks) && risks.length > 0) {
+                            $.each(risks, function (index, risk) {
+                                scoreTableBody += '<tr>';
+                                scoreTableBody += '<td>' + (index + 1) + '</td>';
+                                scoreTableBody += '<td style="display:none;" class="departmentId">' + risk.riskDepartmentId + '</td>';
+                                scoreTableBody += '<td class="department">' + risk.department + '</td>';
+                                scoreTableBody += '<td style="display:none;" class="submissionID">' + risk.submissionId + '</td>';
+                                scoreTableBody += '<td class="submissionYear">' + risk.submissionYear + '</td>';
+                                scoreTableBody += '<td class="submissionType">' + risk.riskSubmissionType + '</td>';
+                                scoreTableBody += '<td><a href="/ApproveRiskRecords/GetScores'
+                                    + '?riskDepartmentId=' + encodeURIComponent(risk.riskDepartmentId)
+                                    + '&submissionId=' + encodeURIComponent(risk.submissionId)
+                                    + '&riskSubmissionType=' + encodeURIComponent(risk.riskSubmissionType)
+                                    + '" class="btn btn-primary btn-sm">View</a></td>';
+                                scoreTableBody += '</tr>';
+                            });
+                        } else {
+                            scoreTableBody = '<tr><td class="text-danger text-center" colspan="7">No scores submitted for approval.</td></tr>';
+                        }
+
+                        $('#scoreTable tbody').html(scoreTableBody);
+                    },
+                    error: function () {
+                        $('#scoreTable tbody').html('<tr><td class="text-danger text-center" colspan="7">Error occurred while fetching risks.</td></tr>');
+                    }
+                });
+            });
+
+            $('#riskRecordBtn').on("click", function () {
+            $.ajax({
+                url: '/ApproveRiskRecords/RecordApproval',
+                type: 'GET',
+                success: function (risks) {
+                    var riskTableBody = '';
+                    // Show the risk table in all cases
+                    $('#riskTable').show();
+                    $('#scoreTable').hide();
+                    $('#riskTableContainer').hide();
+
+                    if (Array.isArray(risks) && risks.length > 0) {
+                        $.each(risks, function (index, risk) {
+                            riskTableBody += '<tr>';
+                            riskTableBody += '<td>' + (index + 1) + '</td>';
+                            riskTableBody += '<td>' + risk + '</td>';
+                            riskTableBody += '<td><a href="/ApproveRiskRecords/GetDepartment?dept=' + encodeURIComponent(risk) + '" class="btn btn-primary btn-sm">View</a></td>';
+                            riskTableBody += '</tr>';
+                        });
+                    } else {
+                        // Display "No records" row when there are no records
+                        riskTableBody = '<tr><td class="text-danger text-center" colspan="7">No records submitted for approval.</td></tr>';
+                    }
+                    // Update table body
+                    $('#riskTable tbody').html(riskTableBody);
+                },
+                error: function () {
+                    $('#riskTable tbody').html('<tr><td class="text-danger text-center" colspan="3">Error occurred while fetching risks.</td></tr>');
+                }
+            });
+        });
+        });
+    </script>
+}

@@ -1,0 +1,192 @@
+﻿@{
+    ViewData["Title"] = "Edit Risk Record";
+}
+
+<!-- Start content -->
+<div class="content">
+    <div class="">
+        <div class="page-header-title">
+            <h4 id="pg_header" class="page-title">@ViewBag.Title</h4>
+        </div>
+    </div>
+    <div class="page-content-wrapper" style="margin-top: -64px;">
+        <div class="panel panel-primary">
+            <div id="selectDept" class="panel-body">
+                <div class="text-center">
+                    <h4>Select Department</h4>
+                    <div class="form-group" style="width: 50%; margin: 0 auto;">
+                        @Html.DropDownList("id", (SelectList)ViewBag.DepartmentList, "Departments", new { @class = "form-control", id = "departmentDropdown" })
+                    </div>
+                </div>
+            </div>
+            <div class="text-center">
+                <p class="text-danger">@ViewBag.ErrMessage</p>
+            </div>
+
+            <div class="panel-body">
+                <div style="overflow-x: auto;" id="riskTableContainer">
+                    <table class="table table-striped" id="riskTable" style="display: none;">
+                        <thead>
+                            <tr>
+                                <th style="display: none;">Department ID</th>
+                                <th>Risk ID</th>
+                                <th>Type of Risk</th>
+                                <th>Risk Area</th>
+                                <th>Risk Description</th>
+                                <th>Business Unit Impacted</th>
+                                <th>Key Controls Assessed by Management (Preliminary Assessment)</th>
+                                <th>Action Plan</th>
+                                <th>Assigned To</th>
+                                <th style="display: none;">Modified</th>
+                                <th style="display: none;">IsApproved</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Risk rows will be dynamically added here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center" style="margin-top: 20px;">
+            <button id="addRow" class="btn btn-success" style="display: none;">Add Row</button>
+            <button id="submitRiskChanges" class="btn btn-primary" style="display: none;">Save Changes</button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @* <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> *@
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+            integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+            crossorigin="anonymous"></script>
+    <script>
+        $(document).ready(function () {
+            // Populate risk table on department selection
+            $('#departmentDropdown').change(function () {
+                var departmentId = $(this).val();
+                if (!departmentId) {
+                    alert('Please select a valid department.');
+                    return;
+                }
+
+                $.ajax({
+                    url: '/EditRiskRecord/GetDepartmentalRisks',
+                    type: 'GET',
+                    data: { departmentId: departmentId },
+                    success: function (risks) {
+                        var riskTableBody = '';
+                        if (Array.isArray(risks) && risks.length > 0) {
+                            $.each(risks, function (index, risk) {
+                                riskTableBody += '<tr>';
+                                riskTableBody += '<td style="display: none;" class="departmentId">' + risk.department_ID + '</td>';
+                                riskTableBody += '<td class="riskID">' + risk.risk_ID + '</td>';
+                                riskTableBody += '<td contenteditable="true" class="riskType">' + risk.type_of_Risk + '</td>';
+                                riskTableBody += '<td contenteditable="true" class="riskArea">' + risk.risk_Area + '</td>';
+                                riskTableBody += '<td contenteditable="true" class="riskDescription">' + risk.risk_Description + '</td>';
+                                riskTableBody += '<td contenteditable="true" class="businessUnitImpacted">' + risk.business_Unit_Impacted + '</td>';
+                                riskTableBody += '<td contenteditable="true" class="managementKeyControls">' + risk.management_Controls + '</td>';
+                                riskTableBody += '<td contenteditable="true" class="actionPlan">' + risk.action_Plan + '</td>';
+                                riskTableBody += '<td contenteditable="true" class="assignedTo">' + risk.assigned_To + '</td>';
+                                riskTableBody += '<td style="display: none;" class="modified">' + risk.modified + '</td>';
+                                riskTableBody += '<td style="display: none;" class="isApproved">' + risk.isApproved + '</td>';
+                                riskTableBody += '</tr>';
+                            });
+                            $('#riskTable').show();
+                            $('#addRow, #submitRiskChanges').show();
+                        } else
+                        {
+                            riskTableBody = '<tr><td class="text-danger" colspan="10">No records found for this department.</td></tr>';
+                        }
+
+                        $('#riskTable tbody').html(riskTableBody);
+
+                        // Attach event listener to update Modified column
+                        $('#riskTable tbody').on('input', '[contenteditable="true"]', function ()
+                        {
+                            var row = $(this).closest('tr');
+                            row.find('.modified').text("1");
+                            row.find('.isApproved').text("0");
+                        });
+                        },
+                        error: function ()
+                        {
+                            $('#riskTable tbody').html('<tr><td class="text-danger" colspan="10">Error occurred while fetching risks.</td></tr>');
+                        }
+                        });
+                        });
+
+                        // Add a new row to the table
+                        $('#addRow').click(function ()
+                        {
+                            var selectedDepartmentId = $('#departmentDropdown').val();
+                            var newRow = `
+                            <tr>
+                                <td style="display: none;" class="departmentId">${selectedDepartmentId}</td>
+                                <td contenteditable="true"class="riskID"></td>
+                                <td contenteditable="true" class="riskType"></td>
+                                <td contenteditable="true" class="riskArea"></td>
+                                <td contenteditable="true" class="riskDescription"></td>
+                                <td contenteditable="true" class="businessUnitImpacted"></td>
+                                <td contenteditable="true" class="managementKeyControls"></td>
+                                <td contenteditable="true" class="actionPlan"></td>
+                                <td contenteditable="true" class="assignedTo"></td>
+                                <td style="display: none;" class="modified">1</td>;
+                                <td style="display: none;" class="isApproved">0</td>;
+                                <td><button class="btn btn-danger btn-sm deleteRow">Delete</button></td>
+                            </tr>
+                        `;
+                        $('#riskTable tbody').append(newRow);
+                    });
+
+                    // Delete a row from the table
+                    $(document).on('click', '.deleteRow', function ()
+                    {
+                        $(this).closest('tr').remove();
+                    });
+
+                    // Submit changes to the server
+                    $('#submitRiskChanges').click(function ()
+                    {
+                        var updatedRisks = [];
+                        $('#riskTable tbody tr').each(function ()
+                        {
+                            var row = $(this);
+                            updatedRisks.push({
+                            Department_ID: row.find('.departmentId').text().trim(),
+                            Risk_ID: row.find('.riskID').text().trim(),
+                            RiskType: row.find('.riskType').text().trim(),
+                            RiskArea: row.find('.riskArea').text().trim(),
+                            RiskDescription: row.find('.riskDescription').text().trim(),
+                            BusinessUnitImpacted: row.find('.businessUnitImpacted').text().trim(),
+                            ManagementKeyControls: row.find('.managementKeyControls').text().trim(),
+                            ActionPlan: row.find('.actionPlan').text().trim(),
+                            AssignedTo: row.find('.assignedTo').text().trim(),
+                            Modified: row.find('.modified').text().trim(),
+                            IsApproved: row.find('.isApproved').text().trim(),
+                        });
+                });
+
+                $.ajax({
+                    url: '/EditRiskRecord/UpdateRiskRecord',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(updatedRisks),
+                    success: function () {
+                        alert('Risk updates saved successfully!');
+                    },
+                    error: function (xhr) {
+                        if (xhr.responseText.includes("Duplicate Risk_IDs")) {
+                            alert("Duplicate Risk_IDs detected.");
+                        } else if (xhr.responseText.includes("Risk ID")) {
+                            alert('Risk ID cannot be empty.');
+                        } else {
+                            alert('An error occurred while saving changes.');
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+}

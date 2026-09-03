@@ -1,0 +1,276 @@
+﻿@{
+    ViewData["Title"] = "Risk Score";
+}
+
+<!-- Start content -->
+<div class="content">
+    <div class="">
+        <div class="page-header-title">
+            <h4 id="pg_header" class="page-title">@ViewBag.Title</h4>
+        </div>
+    </div>
+    @if (ViewBag.DepartmentList != null)
+    {
+        <div class="page-content-wrapper" style="margin-top:-64px">
+            <div class="panel panel-primary">
+                <div id="selectDept" class=" panel-body">
+                    <div class="text-center">
+                        <h4>Select Department</h4>
+
+                        <div class="form-group text-center" style="width: 50%; margin: 0 auto;">
+                            @Html.DropDownList("id", (SelectList)ViewBag.DepartmentList, "Departments", new { @class = "form-control", id = "departmentDropdown" })
+                        </div>
+                    </div>
+                </div>
+                <div class=" panel-body">
+                    <div style="overflow-x: auto;" id="riskTableContainer">
+                        <table class="table table-striped" id="riskTable" style="display:none;">
+                            <thead>
+                                <tr>
+                                    <th style="display:none;">ID</th>
+                                    <th style="display:none;">Risk ID</th>
+                                    <th style="display:none;">Department ID</th>
+                                    <th>Type of Risk</th>
+                                    <th>Risk Area</th>
+                                    <th>Risk Description</th>
+                                    <th>Business Unit Impacted</th>
+                                    <th>Impact_1_2_3_4_or_5</th>
+                                    <th>Likelihood_1_2_3_4_or_5</th>
+                                    <th>Inherent Risk Level(Impact x Likelihood)</th>
+                                    <th>Key Controls Assessed by Management (Preliminary Assessment)</th>
+                                    <th>Control Score (1-5)</th>
+                                    <th>Residual Score</th>
+                                    <th>Status</th>
+                                    <th>Action Plan</th>
+                                    <th>Assigned To</th>
+                                    <th>Risk Level</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Risks rows will be dynamically added here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="text-center" id="submitBtn" style="margin-top: 20px; display:none;">
+            <button id="submitRiskChanges" class="btn btn-primary">Submit Changes</button>
+        </div>
+        
+    } else
+    {
+        <div id="messageDiv" class="text-center">
+            <p class="text-danger">@ViewBag.ErrMessage</p>
+        </div>        
+    }
+
+</div>
+
+@section Scripts {
+    @* <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> *@
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+            integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+            crossorigin="anonymous"></script>
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            $('#departmentDropdown').change(function () {
+                var departmentId = $(this).val();
+                if (departmentId) {
+                    $.ajax({
+                        url: '/RiskEntry/DepartmentalRisk',
+                        type: 'GET',
+                        data: { departmentId: departmentId },
+                        success: function (risks) {
+                            var riskTableBody = '';
+
+                            if (risks.length > 0) {
+                                $.each(risks, function (index, risk) {
+                                    riskTableBody += '<tr>';
+                                    riskTableBody += '<td class="Id" style="display:none;">' + risk.id + '</td>';
+                                    riskTableBody += '<td class="riskId" style="display:none;">' + risk.risk_ID + '</td>';
+                                    riskTableBody += '<td class="departmentId" style="display:none;">' + risk.department_ID + '</td>';
+                                    riskTableBody += '<td>' + risk.type_of_Risk + '</td>';
+                                    riskTableBody += '<td>' + risk.risk_Area + '</td>';
+                                    riskTableBody += '<td>' + risk.risk_Description + '</td>';
+                                    riskTableBody += '<td>' + risk.business_Unit_Impacted + '</td>';
+                                    // Drop-down for Impact
+                                    riskTableBody += '<td>';
+                                    riskTableBody += '<select class="form-control impactDropdown">';
+                                    for (var i = 0; i <= 5; i++) {
+                                        var selected = (risk.Impact == i) ? 'selected' : ''; // Pre-select the current value
+                                        riskTableBody += '<option value="' + i + '" ' + selected + '>' + i + '</option>';
+                                    }
+                                    riskTableBody += '</select>';
+                                    riskTableBody += '</td>';
+                                    // Drop-down for Likelihood
+                                    riskTableBody += '<td>';
+                                    riskTableBody += '<select class="form-control likelihoodDropdown">';
+                                    for (var i = 0; i <= 5; i++) {
+                                        var selected = (risk.Likelihood == i) ? 'selected' : ''; // Pre-select the current value
+                                        riskTableBody += '<option value="' + i + '" ' + selected + '>' + i + '</option>';
+                                    }
+                                    riskTableBody += '</select>';
+                                    riskTableBody += '</td>';
+
+                                    // Inherent level, initially calculated by Impact * Likelihood
+                                    var impact = risk.Impact || 0;
+                                    var likelihood = risk.Likelihood || 0;
+                                    var inherentLevel = impact * likelihood;
+                                    riskTableBody += '<td class="inherentLevel">' + inherentLevel + '</td>';
+
+                                    riskTableBody += '<td>' + risk.management_Controls + '</td>';
+                                    ////////////////////////////////////////////////// - Ridwan
+                                    riskTableBody += '<td>';
+                                    riskTableBody += '<select class="form-control controlScoreDropdown">';
+                                    for (var i = 0; i <= 5; i++) {
+                                        var selected = (risk.control_Score == i) ? 'selected="selected"' : '';
+                                        riskTableBody += '<option value="' + i + '" ' + selected + '>' + i + '</option>';
+                                    }
+                                    riskTableBody += '</select>';
+                                    riskTableBody += '</td>';
+                                    /////////////////////////////////////////////////// - Ridwan
+
+                                    var residualScore = risk.residual_Score || 5;
+                                    riskTableBody += '<td class="residualScore">' + residualScore + '</td>';
+
+                                    // Drop-down for Status
+                                    riskTableBody += '<td>';
+                                    riskTableBody += '<select class="form-control statusDropdown" style="width:94px;">';
+                                    var statusOptions = ['Open', 'Closed'];
+                                    for (var i = 0; i < statusOptions.length; i++) {
+                                        var selected = (risk.Status === statusOptions[i]) ? 'selected' : '';
+                                        riskTableBody += '<option value="' + statusOptions[i] + '" ' + selected + '>' + statusOptions[i] + '</option>';
+                                    }
+                                    riskTableBody += '</select>';
+                                    riskTableBody += '</td>';
+
+
+
+                                    riskTableBody += '<td>' + risk.action_Plan + '</td>';
+                                    riskTableBody += '<td>' + risk.assigned_To + '</td>';
+
+                                    // var riskLevel = inherentLevel <= 5 ? "LOW" : (inherentLevel <= 12 ? "MEDIUM" : "HIGH");
+                                    var riskLevel = inherentLevel > 20 ? "CRITICAL" : (inherentLevel > 12 ? "HIGH": (inherentLevel > 5 ? "MEDIUM" : "LOW"));
+                                    var riskLevelBgColor = inherentLevel <= 5 ? "background-color:green;" : (inherentLevel <= 12 ? "background-color:orange;" : "background-color:red;");
+
+                                    riskTableBody += '<td class="riskLevel" style="' + riskLevelBgColor + ' color:white;">' + riskLevel + '</td>';                                    
+                                });
+
+                                $('#riskTable').show();
+                                $('#submitBtn').show();
+                                $('#selectDept').hide();
+                            } else {
+                                riskTableBody = '<tr><td class="text-danger" colspan="4">No risks record found for this department.</td></tr>';
+                                $('#riskTable').show();
+                                $('#submitBtn').show();
+                                $('#selectDept').hide();
+                            }
+
+                            $('#riskTable tbody').html(riskTableBody);
+
+                            // Attach event listener to update Inherent Level when Impact or Likelihood is changed
+                            $('.impactDropdown, .likelihoodDropdown, .controlScoreDropdown').change(function () {
+                                
+                                var row = $(this).closest('tr');
+
+                                var impact = parseInt(row.find('.impactDropdown').val());
+                                var likelihood = parseInt(row.find('.likelihoodDropdown').val());
+                                var controlScore = parseInt(row.find('.controlScoreDropdown').val());
+
+                                var inherentLevel = impact * likelihood;
+                                var residualScore = 5 - controlScore;
+
+                                row.find('.inherentLevel').text(inherentLevel);
+                                row.find('.residualScore').text(residualScore);
+
+                                // var riskLevel = inherentLevel <= 5 ? "LOW" : (inherentLevel <= 12 ? "MEDIUM" : "HIGH");
+                                var riskLevel = inherentLevel > 20 ? "CRITICAL" : (inherentLevel > 12 ? "HIGH" : (inherentLevel > 5 ? "MEDIUM" : "LOW"));
+                                var riskLevelBgColor = inherentLevel <= 5 ? "green" : (inherentLevel <= 12 ? "orange" : "red");
+
+                                row.find('.riskLevel').text(riskLevel).css({
+                                    "background-color": riskLevelBgColor,
+                                    "color": "white"
+                                });
+
+                                //var riskLevel = inherentLevel <= 3 ? "LOW" : "HIGH";
+                                //var riskLevelBgColor = inherentLevel <= 3 ? "green" : "red";
+
+                                //row.find('.riskLevel').text(riskLevel).css({
+                                //    "background-color": riskLevelBgColor,
+                                //    "color": "white"
+                                //});
+                            });
+                        },
+                        error: function () {
+                            $('#riskTable tbody').html('<tr><td class="text-danger" colspan="4">Error occurred while fetching risks record.</td></tr>');
+                            $('#riskTable').show();
+                            $('#submitBtn').show();
+                            $('#selectDept').hide();
+                        }
+                    });
+                } else {
+                    $('#riskTable').hide();
+                    $('#riskTable tbody').empty();
+                }
+            });
+
+            $('#submitRiskChanges').click(function () {
+                var risksRecords = [];
+
+                $('#riskTable tbody tr').each(function () {
+
+                    var Id = $(this).find('.Id').text().trim();
+                    var riskId = $(this).find('.riskId').text().trim();
+                    var riskDepartmentId = $(this).find('.departmentId').text().trim();                    
+                    var impact = $(this).find('.impactDropdown').val().trim();
+                    var likelihood = $(this).find('.likelihoodDropdown').val().trim();
+                    var inherentLevel = $(this).find('.inherentLevel').text().trim();
+                    var status = $(this).find('.statusDropdown').val();
+                    var controlScore = $(this).find('.controlScoreDropdown').val().trim();
+                    var residualScore = $(this).find('.residualScore').text().trim();
+                    var riskLevel = $(this).find('.riskLevel').text().trim();
+
+                    // Collect data for each risk
+                    risksRecords.push({
+                        ID: Id,
+                        Risk_ID: riskId,
+                        Department_ID: riskDepartmentId,
+                        Impact: impact,
+                        Likelihood: likelihood,
+                        Inherent_level: inherentLevel,
+                        Status: status,
+                        Control_Score: controlScore,
+                        Residual_Score: residualScore,
+                        Risk_Level: riskLevel,
+                    });
+                });
+
+                $.ajax({
+                    url: '/RiskEntry/Create',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(risksRecords),
+                    success: function (response) {
+                        alert('Risk update saved successfully!');
+                    },
+                    error: function (xhr) {
+                        if (xhr.responseText.includes("No opened submission")) {
+                            alert("No opened submission schedule at the moment.");
+                        } else if (xhr.responseText.includes("Already submitted")) {
+                            alert("No multiple submissions allowed, you have already submitted for the current window.");
+                        } else {
+                            alert('An error occurred while saving changes.');
+                        }
+                    }
+                });
+
+            });            
+
+        });
+    </script>
+}
+

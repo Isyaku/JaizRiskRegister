@@ -1,0 +1,72 @@
+﻿@model IEnumerable<RR_Schedule>
+@{
+    ViewData["Title"] = "Submission Schedule List";
+}
+
+<!-- Start content -->
+<div class="content">
+    <div class="">
+        <div class="page-header-title">
+            <h4 id="pg_header" class="page-title">@ViewBag.Title</h4>
+        </div>
+    </div>
+
+    <div class="page-content-wrapper" style="margin-top:22px">
+        <!-- Start container -->
+        <div>
+            <h4 class="text-success">@ViewBag.Message</h4>
+        </div>
+        <table class="table">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">STATUS</th>
+                    <th scope="col">SUBMISSION TYPE</th>
+                    <th scope="col">YEAR</th>
+                    <th scope="col">QUARTER</th>
+                    <th scope="col">MONTH</th>
+                    <th scope="col">CLOSE SCHEDULE</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Any())
+                {
+                    int count = 1;
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <th scope="row">@count</th>
+                            <td>@item.Status</td>
+                            <td>@item.Submission_Type</td>
+                            <td>@item.Submission_Year</td>
+                            <td>@item.Submission_Quarter</td>
+                            <td>@item.Submission_Month</td>
+                            <td>
+                                @if (item.Status.Trim().ToLower() == "open")
+                                {
+                                    <form asp-action="Update" method="post" style="display: inline;">
+                                        <input type="hidden" name="Id" value="@item.Submission_ID" />
+                                        <button type="submit" class="btn btn-success">Close</button>
+                                    </form>
+                                }
+                            </td>
+                        </tr>
+                        count++;
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="7">No records found.</td> <!-- Note: colspan should match the total number of columns -->
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+
+        <!-- End container -->
+    </div>
+    <!-- Page content Wrapper -->
+
+</div>
+

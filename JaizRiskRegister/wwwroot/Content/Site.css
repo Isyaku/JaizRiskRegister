@@ -1,0 +1,143 @@
+﻿
+/*Start Bootstrap override*/
+.field-validation-valid, .field-validation-branchincome-valid, .field-validation-cost-valid {
+    color: red;
+}
+/*End Bootstrap override*/
+
+
+/*Start App Specific Style*/
+.text-field-30 {
+    width: 30%;
+}
+
+.m-l-5 {
+    margin-left: 5px;
+}
+
+/*.login {
+    background: no-repeat url("jaiz-logo-circle.jpg") center top fixed;
+    position: absolute;
+    height: 50%;
+    width: 50%;
+    top: 50;
+}*/
+
+.btn-group .m-l-15 {
+    margin-left: 15px
+}
+
+.range {
+    /*width: 100%;*/
+    height: 80%;
+}
+
+.range-start {
+    margin-right: 5px;
+}
+
+.range-stop {
+    margin-right: 5px;
+    margin-left: 5px;
+}
+
+/* Customize the label (the checkbox-container) */
+.checkbox-container {
+    display: block;
+    position: relative;
+    padding-left: 35px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    font-size: 22px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    left: 50%;
+    margin-bottom: 100%;
+}
+
+tbody .checkbox-container {
+    left: 30%;
+    margin-bottom: 100%;
+}
+
+/* Hide the browser's default checkbox */
+.checkbox-container input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+/* Create a custom checkbox */
+.checkmark {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    height: 25px;
+    width: 25px;
+    border-radius: 20px;
+    background-color: #eee;
+}
+
+/* On mouse-over, add a grey background color */
+.checkbox-container:hover input ~ .checkmark {
+    background-color: #ccc;
+}
+
+/* When the checkbox is checked, add a blue background */
+.checkbox-container input:checked ~ .checkmark {
+    background-color: #5cb45b;
+}
+
+/* Create the checkmark/indicator (hidden when not checked) */
+.checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+/* Show the checkmark when checked */
+.checkbox-container input:checked ~ .checkmark:after {
+    display: block;
+}
+
+/* Style the checkmark/indicator */
+.checkbox-container .checkmark:after {
+    left: 9px;
+    top: 5px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 3px 3px 0;
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+}
+
+
+/* Start ReroutedRequest Specific Styles */
+
+div.icon-demo-content:hover, div.icon-demo-content i:hover {
+    color: #5cb45b;
+}
+
+/* End ReroutedRequest Specific Styles */
+
+#riskTable th, tbody, td {
+    border: 1px solid black; /* Adds border to the header cells */
+    white-space: nowrap; /* Prevents text from wrapping */
+    text-align: center; /* Centers the header text */
+}
+
+#riskTable thead {
+    width: 100%; /* Ensure header takes full width */
+}
+
+#riskTable {
+    width: 100%; /* Ensure table takes full width */
+}
+
+/* End App Specific Styles */

@@ -1,0 +1,66 @@
+﻿@model X.PagedList.IPagedList<RR_Action_Log>
+
+@using X.PagedList.Mvc.Core;
+
+@{
+    ViewBag.Title = "Action Logs";
+}
+
+<!-- Start content -->
+<div class="content">
+    <div class="">
+        <div class="page-header-title">
+            <h4 id="pg_header" class="page-title">@ViewBag.Title</h4>
+        </div>
+    </div>
+    <div class="page-content-wrapper" style="margin-top: 12px;">
+        <div class="panel-body">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>SN</th> <!-- Serial Number -->
+                        <th>Staff ID</th>
+                        <th>Action Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Any())
+                    {
+                        int serialNumber = (Model.PageNumber - 1) * Model.PageSize + 1;
+                        foreach (var record in Model)
+                        {
+                            <tr>
+                                <td>@serialNumber</td> <!-- Serial Number -->
+                                <td>@record.StaffID</td>
+                                <td>@record.ActionDate.ToString("yyyy-MM-dd")</td>
+                                <td>@record.Action</td>
+                            </tr>
+                            serialNumber++;
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="4" class="text-center">No records found.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <!-- Pagination Controls -->
+        <div class="text-center">
+            @Html.PagedListPager(Model, page => Url.Action("Index", new { page }), new PagedListRenderOptions
+       {
+           DisplayLinkToFirstPage = PagedListDisplayMode.Always,
+           DisplayLinkToLastPage = PagedListDisplayMode.Always,
+           DisplayLinkToPreviousPage = PagedListDisplayMode.Always,
+           DisplayLinkToNextPage = PagedListDisplayMode.Always,
+           DisplayLinkToIndividualPages = true,
+           MaximumPageNumbersToDisplay = 5,
+           ContainerDivClasses = new[] { "pagination" },
+           UlElementClasses = new[] { "pagination" }
+       })
+        </div>
+    </div>
+</div>
